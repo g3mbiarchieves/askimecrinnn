@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aşkımm ❤️</title>
+  <meta name="description" content="Sana özel hazırlanmış bir sürpriz..." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* ==================== RESET & BASE ==================== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #020617 0%, #1e1035 40%, #2d1230 70%, #0f0520 100%);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ==================== AMBIENT GLOW ==================== */
+    .glow-pink {
+      position: fixed;
+      top: -5%;
+      left: -10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+
+    .glow-purple {
+      position: fixed;
+      bottom: -10%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(147, 51, 234, 0.12) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      animation: drift 15s ease-in-out infinite alternate-reverse;
+    }
+
+    .glow-blue {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      animation: pulse-glow 8s ease-in-out infinite;
+    }
+
+    @keyframes drift {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(40px, 30px) scale(1.15); }
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+    }
+
+    /* ==================== FLOATING HEARTS ==================== */
+    .floating-hearts {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .floating-heart {
+      position: absolute;
+      font-size: 1.2rem;
+      opacity: 0;
+      animation: float-up linear infinite;
+    }
+
+    @keyframes float-up {
+      0% {
+        opacity: 0;
+        transform: translateY(100vh) rotate(0deg) scale(0.5);
+      }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.3; }
+      100% {
+        opacity: 0;
+        transform: translateY(-20vh) rotate(360deg) scale(1);
+      }
+    }
+
+    /* ==================== PROGRESS DOTS ==================== */
+    .progress-bar {
+      position: fixed;
+      top: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 100;
+    }
+
+    .progress-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .progress-dot.active {
+      background: linear-gradient(135deg, #ec4899, #a855f7);
+      transform: scale(1.35);
+      box-shadow: 0 0 12px rgba(236, 72, 153, 0.6);
+    }
+
+    /* ==================== STEP CONTAINER ==================== */
+    .step {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      max-width: 560px;
+      width: 100%;
+      text-align: center;
+      z-index: 10;
+      gap: 2rem;
+      padding: 2rem 0;
+    }
+
+    .step.visible {
+      display: flex;
+      animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* ==================== BADGE / TAG ==================== */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    .badge-pink {
+      background: rgba(236, 72, 153, 0.1);
+      border: 1px solid rgba(236, 72, 153, 0.2);
+      color: #f9a8d4;
+    }
+
+    .badge-purple {
+      background: rgba(147, 51, 234, 0.1);
+      border: 1px solid rgba(147, 51, 234, 0.2);
+      color: #c4b5fd;
+    }
+
+    /* ==================== HEADINGS ==================== */
+    .heading-gradient {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #f9a8d4 0%, #c4b5fd 50%, #a5b4fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .heading-lg {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    /* ==================== GLASSMORPHISM CARD ==================== */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    /* ==================== POLAROID PHOTOS ==================== */
+    .photos-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .polaroid {
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: default;
+    }
+
+    .polaroid:first-child:hover { transform: rotate(2deg) scale(1.03); }
+    .polaroid:last-child:hover { transform: rotate(-2deg) scale(1.03); }
+
+    .polaroid-img-wrapper {
+      width: 100%;
+      height: 180px;
+      overflow: hidden;
+      border-radius: 0.75rem;
+      background: #1e1b4b;
+    }
+
+    .polaroid-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .polaroid:hover .polaroid-img-wrapper img {
+      transform: scale(1.08);
+    }
+
+    .polaroid-label {
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #f9a8d4;
+    }
+
+    /* ==================== LOVE COUNTER ==================== */
+    .counter-box {
+      width: 100%;
+      padding: 1.5rem;
+      space-y: 1rem;
+    }
+
+    .counter-label {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      margin-bottom: 1rem;
+    }
+
+    .counter-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+    }
+
+    .counter-cell {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 1rem;
+      padding: 0.75rem 0.5rem;
+      text-align: center;
+    }
+
+    .counter-value {
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: #f472b6;
+      display: block;
+      line-height: 1.2;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .counter-unit {
+      font-size: 0.7rem;
+      color: #6b7280;
+      margin-top: 0.15rem;
+      display: block;
+    }
+
+    /* ==================== HEART PULSE ICON ==================== */
+    .heart-pulse {
+      color: #ec4899;
+      animation: heartbeat 1.2s ease-in-out infinite;
+      display: inline-block;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      14% { transform: scale(1.2); }
+      28% { transform: scale(1); }
+      42% { transform: scale(1.15); }
+      56% { transform: scale(1); }
+    }
+
+    /* ==================== PRIMARY BUTTON ==================== */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 2rem;
+      background: linear-gradient(135deg, #ec4899, #9333ea);
+      border: none;
+      border-radius: 1rem;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow:
+        0 4px 20px rgba(236, 72, 153, 0.3),
+        0 0 0 0 rgba(236, 72, 153, 0);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.05) translateY(-2px);
+      box-shadow:
+        0 8px 30px rgba(236, 72, 153, 0.45),
+        0 0 0 4px rgba(236, 72, 153, 0.1);
+    }
+
+    .btn-primary:hover::before {
+      opacity: 1;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-icon {
+      transition: transform 0.3s;
+    }
+
+    .btn-primary:hover .btn-icon {
+      transform: translateX(3px);
+    }
+
+    /* ==================== QUIZ ==================== */
+    .quiz-card {
+      width: 100%;
+      padding: 1.75rem;
+    }
+
+    .quiz-question {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #f9a8d4;
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .quiz-option {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 0.85rem;
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+    }
+
+    .quiz-option:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateX(4px);
+    }
+
+    .quiz-option-arrow {
+      color: #6b7280;
+      font-size: 0.85rem;
+      transition: transform 0.25s;
+    }
+
+    .quiz-option:hover .quiz-option-arrow {
+      transform: translateX(3px);
+      color: #f472b6;
+    }
+
+    /* Quiz Complete */
+    .quiz-complete {
+      text-align: center;
+      padding: 1.75rem;
+    }
+
+    .check-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 1rem;
+      color: #4ade80;
+    }
+
+    /* ==================== REASONS CARDS ==================== */
+    .reasons-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      width: 100%;
+    }
+
+    @media (max-width: 640px) {
+      .reasons-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .reason-card {
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: default;
+    }
+
+    .reason-card:hover {
+      transform: scale(1.06) translateY(-4px);
+      border-color: rgba(236, 72, 153, 0.2);
+      box-shadow: 0 12px 40px rgba(236, 72, 153, 0.1);
+    }
+
+    .reason-heart {
+      width: 36px;
+      height: 36px;
+      color: #f472b6;
+    }
+
+    .reason-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .reason-text {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      line-height: 1.5;
+    }
+
+    /* ==================== FINAL CARD ==================== */
+    .final-card {
+      padding: 2.5rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .final-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(
+        from 0deg,
+        transparent,
+        rgba(236, 72, 153, 0.05),
+        transparent,
+        rgba(147, 51, 234, 0.05),
+        transparent
+      );
+      animation: rotate-bg 12s linear infinite;
+    }
+
+    @keyframes rotate-bg {
+      to { transform: rotate(360deg); }
+    }
+
+    .final-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .final-heart-ring {
+      width: 72px;
+      height: 72px;
+      background: rgba(236, 72, 153, 0.12);
+      border: 1px solid rgba(236, 72, 153, 0.25);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+
+    .final-heart-icon {
+      width: 36px;
+      height: 36px;
+      color: #f472b6;
+      animation: bounce-heart 1.5s ease-in-out infinite;
+    }
+
+    @keyframes bounce-heart {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .final-message {
+      font-size: 1.1rem;
+      color: #d1d5db;
+      line-height: 1.75;
+      font-weight: 300;
+      margin-bottom: 1.5rem;
+    }
+
+    .final-divider {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      margin: 0 0 1.5rem;
+    }
+
+    .final-love-text {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      background: linear-gradient(135deg, #f472b6, #fb7185, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: glow-text 2.5s ease-in-out infinite alternate;
+      text-shadow: none;
+    }
+
+    @keyframes glow-text {
+      0% { filter: drop-shadow(0 0 10px rgba(244, 114, 182, 0.4)); }
+      100% { filter: drop-shadow(0 0 25px rgba(244, 114, 182, 0.8)); }
+    }
+
+    /* ==================== SPARKLE SVG ==================== */
+    .sparkle-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 480px) {
+      .heading-gradient {
+        font-size: 1.85rem;
+      }
+
+      .polaroid-img-wrapper {
+        height: 140px;
+      }
+
+      .counter-value {
+        font-size: 1.3rem;
+      }
+
+      .final-love-text {
+        font-size: 1.35rem;
+      }
+
+      .reasons-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ==================== MUSIC TOGGLE ==================== */
+    .music-toggle {
+      position: fixed;
+      bottom: 1.25rem;
+      right: 1.25rem;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #f472b6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 100;
+      transition: all 0.3s ease;
+      font-size: 1.2rem;
+    }
+
+    .music-toggle:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: scale(1.1);
+    }
+
+    .music-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 18px;
+    }
+
+    .music-bar {
+      width: 3px;
+      background: #f472b6;
+      border-radius: 2px;
+      transition: height 0.3s;
+    }
+
+    .music-bars.playing .music-bar:nth-child(1) { animation: bar-bounce 0.6s ease-in-out infinite alternate; height: 8px; }
+    .music-bars.playing .music-bar:nth-child(2) { animation: bar-bounce 0.6s ease-in-out 0.15s infinite alternate; height: 14px; }
+    .music-bars.playing .music-bar:nth-child(3) { animation: bar-bounce 0.6s ease-in-out 0.3s infinite alternate; height: 10px; }
+    .music-bars.playing .music-bar:nth-child(4) { animation: bar-bounce 0.6s ease-in-out 0.1s infinite alternate; height: 16px; }
+
+    .music-bars:not(.playing) .music-bar { height: 4px !important; animation: none !important; }
+
+    @keyframes bar-bounce {
+      to { height: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Ambient Glows -->
+  <div class="glow-pink"></div>
+  <div class="glow-purple"></div>
+  <div class="glow-blue"></div>
+
+  <!-- Floating Hearts -->
+  <div class="floating-hearts" id="floatingHearts"></div>
+
+  <!-- Progress Dots -->
+  <div class="progress-bar" id="progressBar">
+    <div class="progress-dot active" id="dot1"></div>
+    <div class="progress-dot" id="dot2"></div>
+    <div class="progress-dot" id="dot3"></div>
+    <div class="progress-dot" id="dot4"></div>
+  </div>
+
+  <!-- ============ STEP 1: WELCOME ============ -->
+  <div class="step visible" id="step1">
+    <div>
+      <span class="badge badge-pink">
+        <svg class="sparkle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+        Her Şey Nasıl Başladı...
+      </span>
+      <h1 class="heading-gradient" style="margin-top: 0.75rem;">Bizim Hikayemiz</h1>
+    </div>
+
+    <!-- Childhood Photos -->
+    <div class="photos-grid">
+      <div class="glass-card polaroid">
+        <div class="polaroid-img-wrapper">
+          <img src="slm/cocuk.jpeg" alt="Benim Çocukluğum" />
+        </div>
+        <p class="polaroid-label">Benim Çocukluğum 🤍</p>
+      </div>
+      <div class="glass-card polaroid">
+        <div class="polaroid-img-wrapper">
+          <img src="slm/cocuklukkız.jpeg" alt="Senin Çocukluğun" style="object-position: top;" />
+        </div>
+        <p class="polaroid-label">Senin Çocukluğun ✨</p>
+      </div>
+    </div>
+
+    <!-- Love Counter -->
+    <div class="glass-card counter-box">
+      <p class="counter-label">
+        <span class="heart-pulse">❤️</span> Biz 'Biz' Olalı...
+      </p>
+      <div class="counter-grid">
+        <div class="counter-cell">
+          <span class="counter-value" id="counterDays">0</span>
+          <span class="counter-unit">Gün</span>
+        </div>
+        <div class="counter-cell">
+          <span class="counter-value" id="counterHours">0</span>
+          <span class="counter-unit">Saat</span>
+        </div>
+        <div class="counter-cell">
+          <span class="counter-value" id="counterMinutes">0</span>
+          <span class="counter-unit">Dakika</span>
+        </div>
+        <div class="counter-cell">
+          <span class="counter-value" id="counterSeconds">0</span>
+          <span class="counter-unit">Saniye</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="goToStep(2)">
+      Hikayemize Başlayalım
+      <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+  </div>
+
+  <!-- ============ STEP 2: QUIZ ============ -->
+  <div class="step" id="step2">
+    <div>
+      <span class="badge badge-purple">Minik Test 🎯</span>
+      <h2 class="heading-lg" style="margin-top: 0.75rem;">Bizi Ne Kadar Tanıyorsun?</h2>
+    </div>
+
+    <div class="glass-card quiz-card" id="quizContainer">
+      <p class="quiz-question" id="quizQuestion"></p>
+      <div class="quiz-options" id="quizOptions"></div>
+    </div>
+
+    <div class="glass-card quiz-complete" id="quizComplete" style="display: none;">
+      <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+      <h3 class="heading-lg" style="margin-bottom: 0.5rem;">Harikasın! ❤️</h3>
+      <p style="color: #9ca3af; margin-bottom: 1.5rem;">Tüm soruları başarıyla tamamladın. Şimdi asıl sürprize geçelim!</p>
+      <button class="btn-primary" onclick="goToStep(3)" style="margin: 0 auto;">
+        Seni Neden Seviyorum?
+        <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ============ STEP 3: REASONS ============ -->
+  <div class="step" id="step3">
+    <div>
+      <span class="badge badge-pink">Sana Dair 💌</span>
+      <h2 class="heading-lg" style="margin-top: 0.75rem;">Seni Sevmemin Nedenleri</h2>
+    </div>
+
+    <div class="reasons-grid">
+      <div class="glass-card reason-card">
+        <svg class="reason-heart" viewBox="0 0 24 24" fill="rgba(244,114,182,0.2)" stroke="#f472b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        <h4 class="reason-title">Gülüşün</h4>
+        <p class="reason-text">Gülünce gözlerinin içinin parlamasını çok seviyorum.</p>
+      </div>
+      <div class="glass-card reason-card">
+        <svg class="reason-heart" viewBox="0 0 24 24" fill="rgba(244,114,182,0.2)" stroke="#f472b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        <h4 class="reason-title">Desteğin</h4>
+        <p class="reason-text">Her anımda yanımda olduğunu hissettirmeni seviyorum.</p>
+      </div>
+      <div class="glass-card reason-card">
+        <svg class="reason-heart" viewBox="0 0 24 24" fill="rgba(244,114,182,0.2)" stroke="#f472b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        <h4 class="reason-title">Varlığın</h4>
+        <p class="reason-text">Sadece yanımda olmanın bile huzur vermesini seviyorum.</p>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="goToStep(4)" style="margin-top: 0.5rem;">
+      Son Sürpriz...
+      <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+    </button>
+  </div>
+
+  <!-- ============ STEP 4: FINAL ============ -->
+  <div class="step" id="step4">
+    <div class="glass-card final-card">
+      <div class="final-content">
+        <div class="final-heart-ring">
+          <svg class="final-heart-icon" viewBox="0 0 24 24" fill="#f472b6" stroke="#f472b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        </div>
+        <p class="final-message">
+          İyi ki hayatıma girdin, iyi ki benim oldun. Birlikte geçireceğimiz daha nice güzel günlerimize, anılarımıza...
+        </p>
+        <hr class="final-divider" />
+        <h1 class="final-love-text">SENİ ÇOK SEVİYORUM AŞKIMMM ❤️</h1>
+      </div>
+    </div>
+  </div>
+
+  <!-- Music Toggle (placeholder — no audio source needed) -->
+  <!--
+  <button class="music-toggle" id="musicToggle" onclick="toggleMusic()">
+    <div class="music-bars" id="musicBars">
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+    </div>
+  </button>
+  -->
+
+  <script>
+    // ==================== STATE ====================
+    let currentStep = 1;
+    let currentQuestion = 0;
+    let quizScore = 0;
+
+    const START_DATE = new Date('2026-10-04T22:57:00');
+
+    const questions = [
+      {
+        question: "En sevdiğimiz ortak aktivite nedir?",
+        options: ["Gece yürüyüşü yapmak", "Birlikte dizi izlemek", "Kahve içip sohbet etmek", "Hepsi!"],
+        correct: 3,
+      },
+      {
+        question: "Beni en çok ne güldürür?",
+        options: ["Komik taklitler", "Senin tatlı sakarlıkların", "İç esprilerimiz", "Hepsi!"],
+        correct: 3,
+      },
+      {
+        question: "Bizim ilişkimizin en güzel yanı ne?",
+        options: ["Birbirimizi olduğumuz gibi sevmek", "Her an eğlenebilmek", "Sonsuz güven", "Hepsinden fazlası!"],
+        correct: 3,
+      },
+    ];
+
+    // ==================== COUNTER ====================
+    function updateCounter() {
+      const now = new Date();
+      const diff = now.getTime() - START_DATE.getTime();
+
+      if (diff > 0) {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((diff / 1000 / 60) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+
+        document.getElementById('counterDays').textContent = days;
+        document.getElementById('counterHours').textContent = hours;
+        document.getElementById('counterMinutes').textContent = minutes;
+        document.getElementById('counterSeconds').textContent = seconds;
+      }
+    }
+
+    setInterval(updateCounter, 1000);
+    updateCounter();
+
+    // ==================== FLOATING HEARTS ====================
+    function createFloatingHearts() {
+      const container = document.getElementById('floatingHearts');
+      const hearts = ['💕', '💗', '💖', '✨', '💜', '🤍'];
+
+      for (let i = 0; i < 12; i++) {
+        const heart = document.createElement('span');
+        heart.className = 'floating-heart';
+        heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+        heart.style.left = Math.random() * 100 + '%';
+        heart.style.animationDuration = (8 + Math.random() * 12) + 's';
+        heart.style.animationDelay = (Math.random() * 10) + 's';
+        heart.style.fontSize = (0.8 + Math.random() * 0.8) + 'rem';
+        container.appendChild(heart);
+      }
+    }
+    createFloatingHearts();
+
+    // ==================== CONFETTI ====================
+    function triggerConfetti() {
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#ec4899', '#a855f7', '#f472b6', '#c084fc', '#fda4af'],
+      });
+    }
+
+    // ==================== STEP NAVIGATION ====================
+    let confettiInterval = null;
+
+    function goToStep(step) {
+      // Hide current
+      document.getElementById('step' + currentStep).classList.remove('visible');
+
+      // Update dots
+      document.getElementById('dot' + currentStep).classList.remove('active');
+      document.getElementById('dot' + step).classList.add('active');
+
+      currentStep = step;
+
+      // Show new step with a tiny delay for animation
+      setTimeout(() => {
+        document.getElementById('step' + step).classList.add('visible');
+      }, 50);
+
+      // Step-specific logic
+      if (step === 2) {
+        renderQuestion();
+      }
+
+      if (step === 4) {
+        triggerConfetti();
+        confettiInterval = setInterval(triggerConfetti, 3000);
+      } else {
+        if (confettiInterval) {
+          clearInterval(confettiInterval);
+          confettiInterval = null;
+        }
+      }
+
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==================== QUIZ ====================
+    function renderQuestion() {
+      const q = questions[currentQuestion];
+      document.getElementById('quizQuestion').textContent = q.question;
+
+      const optionsContainer = document.getElementById('quizOptions');
+      optionsContainer.innerHTML = '';
+
+      q.options.forEach((option, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option';
+        btn.innerHTML = `
+          <span>${option}</span>
+          <span class="quiz-option-arrow">›</span>
+        `;
+        btn.addEventListener('click', () => handleAnswer(idx));
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(idx) {
+      if (idx === questions[currentQuestion].correct) {
+        triggerConfetti();
+        quizScore++;
+      }
+
+      if (currentQuestion + 1 < questions.length) {
+        currentQuestion++;
+        // Micro-animation: fade out and in
+        const container = document.getElementById('quizContainer');
+        container.style.opacity = '0';
+        container.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+          renderQuestion();
+          container.style.transition = 'all 0.35s ease';
+          container.style.opacity = '1';
+          container.style.transform = 'translateY(0)';
+        }, 200);
+      } else {
+        // Quiz completed
+        triggerConfetti();
+        document.getElementById('quizContainer').style.display = 'none';
+        document.getElementById('quizComplete').style.display = 'block';
+        document.getElementById('quizComplete').style.animation = 'fadeInUp 0.5s ease forwards';
+      }
+    }
+  </script>
+</body>
+</html>
